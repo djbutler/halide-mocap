@@ -1,0 +1,2 @@
+#!/bin/bash
+DYLD_LIBRARY_PATH=/Users/djbutler/dev/halide/bin /Users/djbutler/dev/halide-mocap/bin/argmax
