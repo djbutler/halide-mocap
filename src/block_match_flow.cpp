@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 
     // This program computes a very crude optical flow estimate using block matching
     const int HALF_BLOCK_WIDTH = 3;
-    const int HALF_DISPLACEMENT = 12;
+    const int HALF_DISPLACEMENT = 10;
     
     Halide::Target target = Halide::get_target_from_environment();
     bool has_opengl = target.has_feature(Halide::Target::OpenGLCompute);
@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
 
     conv(x, y, i, j) = 
         Halide::sum(diff * diff);
+        //Halide::sum(Halide::cast<int32_t>(diff * diff));
 
     const int SCALE_FACTOR = 10;
     Halide::Func flow;
@@ -49,33 +50,21 @@ int main(int argc, char **argv) {
                                Halide::cast<uint8_t>(disp_tup[1] * SCALE_FACTOR + 127),
                                disp_tup[2]);
                   
-    // Split the y coordinate of the consumer into strips of 16 scanlines:
-    Halide::Var yo, yi;
-    flow.split(y, yo, yi, 16);
-    // Compute the strips using a thread pool and a task queue.
-    flow.parallel(yo);
-    // Vectorize across x by a factor of four.
-    flow.vectorize(x, 4);
+    // Tiles of size 128x128, xy-fused, and parallelized 
+    Halide::Var xo, yo, xi, yi;
+    Halide::Var tile_index;
+    flow
+        .tile(x, y, xo, yo, xi, yi, 128, 128)
+        .fuse(xo, yo, tile_index)
+        .parallel(tile_index);
 
-    // Now store the producer per-strip. This will be 17 scanlines
-    // of the producer (16+1), but hopefully it will fold down
-    // into a circular buffer of two scanlines:
-    conv.store_at(flow, yo);
-    // Within each strip, compute the producer per scanline of the
-    // consumer, skipping work done on previous scanlines.
-    conv.compute_at(flow, yi);
+    flow.vectorize(xi, 4);
+
+    // Store only enough of conv at a time to compute each tile
+    //conv.store_at(flow, xo);
+    conv.compute_at(flow, xi);
     // Also vectorize the producer (because sin is vectorizable on x86 using SSE).
-    conv.vectorize(x, 4);
-
-    printf("Pseudo-code for the conv schedule:\n");
-    conv.print_loop_nest();
-    printf("\n");
-
-    printf("Pseudo-code for the flow schedule:\n");
-    flow.print_loop_nest();
-    printf("\n");
-
-    flow.compile_to_lowered_stmt("flow.html", {}, Halide::HTML);
+    conv.vectorize(i, 4);
 
     Halide::Realization r = 
         flow.realize(input0.width(), input0.height()); 
@@ -90,6 +79,16 @@ int main(int argc, char **argv) {
 
     Halide::Image<float> cost = r[2];
     save_image(cost, "cost.png");
+
+    printf("Pseudo-code for the conv schedule:\n");
+    conv.print_loop_nest();
+    printf("\n");
+
+    printf("Pseudo-code for the flow schedule:\n");
+    flow.print_loop_nest();
+    printf("\n");
+
+    flow.compile_to_lowered_stmt("flow.html", {}, Halide::HTML);
 
     printf("Success!\n");
     return 0;
