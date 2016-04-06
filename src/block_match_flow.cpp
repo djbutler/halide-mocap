@@ -8,10 +8,11 @@
 
 // The only Halide header file you need is Halide.h. It includes all of Halide.
 #include "Halide.h"
-using namespace Halide;
-
+#include "clock.h"
 // Include some support code for loading pngs.
 #include "halide_image_io.h"
+
+using namespace Halide;
 using namespace Halide::Tools;
 
 int main(int argc, char **argv) {
@@ -30,18 +31,19 @@ int main(int argc, char **argv) {
     Func padded0 = BoundaryConditions::repeat_edge(input0);
     Func padded1 = BoundaryConditions::repeat_edge(input1);
 
-    Func conv;
+    Func conv, diff;
     RDom block(-HALF_BLOCK_WIDTH, 2*HALF_BLOCK_WIDTH+1, -HALF_BLOCK_WIDTH, 2*HALF_BLOCK_WIDTH+1);
     Var x, y, i, j;
 
-    // NOTE: only uses one color channel (for speed)
-    Expr diff =
-        cast<float>(padded0(x+block.x, y+block.y, 0)) -
-        cast<float>(padded1(x+i+block.x, y+j+block.y, 0));
 
-    conv(x, y, i, j) = 
-        sum(diff * diff);
-        //sum(cast<int32_t>(diff * diff));
+    // NOTE: only uses one color channel (for speed)
+    diff(x, y, i, j) =
+        cast<float>(padded0(x, y, 0)) -
+        cast<float>(padded1(x+i, y+j, 0));
+
+    Expr d = diff(x+block.x, y+block.y, i, j);
+
+    conv(x, y, i, j) = sum(d*d);
 
     const int SCALE_FACTOR = 10;
     Func flow;
@@ -55,7 +57,7 @@ int main(int argc, char **argv) {
     Var xo, yo, xi, yi;
     Var tile_index;
     flow
-        .tile(x, y, xo, yo, xi, yi, 128, 128)
+        .tile(x, y, xo, yo, xi, yi, 32, 32)
         .fuse(xo, yo, tile_index)
         .parallel(tile_index);
 
@@ -64,13 +66,20 @@ int main(int argc, char **argv) {
     // Store only enough of conv at a time to compute each tile
     //conv.store_at(flow, xo);
     conv.compute_at(flow, xi);
-    // Also vectorize the producer (because sin is vectorizable on x86 using SSE).
-    conv.vectorize(i, 4);
+    conv.vectorize(x, 4);
+
+    //diff.store_at(flow, tile_index);
+    
+    //diff.compute_at(conv, x);
+    //diff.vectorize(x, 4);
+
+    double t1 = current_time();
 
     Realization r = 
         flow.realize(input0.width(), input0.height()); 
 
-    printf("Realization r = %zu\n", r.size());
+    double t2 = current_time();
+    printf("%1.4f milliseconds\n", t2-t1); 
 
     Image<uint8_t> flow_x = r[0];
     save_image(flow_x, "flow_x.png");
