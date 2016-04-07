@@ -1,0 +1,4 @@
+- render flow color instead of separate x- and y-channels
+- try using all three color channels for SSD
+- use cross-bilateral filtering to smooth and in-paint flow based on RGB
+- compute flow uncertainty (ratio of 1st- to 2nd-lowest score? distance from 1st to 2nd?)
