@@ -12,5 +12,6 @@
 # Unsure how to do
 - use region-growing to segment foreground object
 - propgate segment from frame-to-frame to *improve* beyond pairwise flow estimates
+    - NOTE: according to Richard, this will probably require well-calibrated uncertainty scores and a sound update rule
 - adaptively select the max window displacement (binary search, h264-style?) to speed up matching
 
