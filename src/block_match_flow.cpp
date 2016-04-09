@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     Tuple disp_tup = argmin(conv(x, y, displacement.x, displacement.y));
     flow(x, y) = Tuple(cast<uint8_t>(disp_tup[0] * SCALE_FACTOR + 127),
                                cast<uint8_t>(clamp(disp_tup[1] * SCALE_FACTOR + 127.0f, 0.0f, 255.0f)),
-                               disp_tup[2]*20.0f);
+                               cast<uint8_t>(clamp(sqrt(disp_tup[2])*5.0f / (1.0f * HALF_BLOCK_WIDTH), 0.0f, 255.0f)));
                   
     downsampled_flow(x, y) = flow(x, y);
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
     Image<uint8_t> flow_y = r[1];
     save_image(flow_y, img_dir + "/flow_y.png");
 
-    Image<float> cost = r[2];
+    Image<uint8_t> cost = r[2];
     save_image(cost, img_dir + "/cost.png");
 
     /*
