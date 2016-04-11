@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     // This program computes a very crude optical flow estimate using block matching
     const int HALF_BLOCK_WIDTH = 3;
     const int HALF_DISPLACEMENT = 16;
-    const int DOWNSAMPLE_FACTOR = 2;
+    const int DOWNSAMPLE_FACTOR = 1;
     const int SCALE_FACTOR = 10.0f;
 
     std::string img_dir(argv[1]);
