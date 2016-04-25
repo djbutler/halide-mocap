@@ -57,12 +57,14 @@ int main(int argc, char **argv) {
     Var xo, yo, xi, yi;
     Var tile_index;
     flow
-        //.compute_root().gpu_tile(x, y, 8, 8);
+        .compute_root().gpu_tile(x, y, 16, 16);
+    /*
         .tile(x, y, xo, yo, xi, yi, 128, 128)
         .fuse(xo, yo, tile_index)
         .parallel(tile_index);
 
     flow.vectorize(xi, 4);
+    */
     
 
     // Store only enough of conv at a time to compute each tile
