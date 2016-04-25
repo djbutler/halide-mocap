@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
     // This program computes a very crude optical flow estimate using block matching
     const int HALF_BLOCK_WIDTH = 5;
-    const int HALF_DISPLACEMENT = 10;
+    const int HALF_DISPLACEMENT = 5;
    
     /* 
     Target target = get_target_from_environment();
