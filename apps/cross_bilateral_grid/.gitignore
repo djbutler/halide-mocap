@@ -1,0 +1,6 @@
+filter
+out.png
+bilateral_grid
+bilateral_grid.h
+bilateral_grid.dSYM/
+*.o
