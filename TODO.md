@@ -1,3 +1,9 @@
+Understand how GPU can be used to improved performance. Start with small examples and play with parameters. Look for compute-intensive operations that resemble convolution.
+
+https://github.com/halide/Halide/blob/master/test/correctness/convolution.cpp
+https://github.com/halide/Halide/blob/master/apps/bilateral_grid/bilateral_grid.cpp
+https://github.com/halide/Halide/wiki/Minimal-GPU-example
+
 # Know how to do 
 - render flow color instead of separate x- and y-channels
 - try using all three color channels for SSD
