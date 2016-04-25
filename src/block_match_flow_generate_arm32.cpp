@@ -90,6 +90,7 @@ int main(int argc, char **argv) {
     target.set_features(arm_features);
     // We then pass the target as the last argument to compile_to_file.
     flow.compile_to_file("block_match_flow_arm32", args, target);
+//    flow.compile_to_c("block_match_flow_arm32_debug.cpp", args, "flow", target);
 
     flow.print_loop_nest();
 
