@@ -66,12 +66,12 @@ int main(int argc, char **argv) {
     
 
     // Store only enough of conv at a time to compute each tile
-    conv.compute_root().gpu_tile(x, y, 8, 8);
+//    conv.compute_root().gpu_tile(x, y, 8, 8);
     //conv.gpu_tile(x, y, 16, 16); // Cannot parallelize dimension x.__thread_id_x of function conv because the function is scheduled inline
-//    conv.store_at(flow, xo);
-//    conv.compute_at(flow, xi);
+  //  conv.store_at(flow, xo);
+    conv.compute_at(flow, xi);
     // Also vectorize the producer (because sin is vectorizable on x86 using SSE).
-//    conv.vectorize(i, 4);
+    conv.vectorize(i, 4);
 
     // Declare the arguments.
     //Param<uint8_t> offset;
