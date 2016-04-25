@@ -12,7 +12,7 @@ include/block_match_flow_arm32.h: bin/block_match_flow_generate_arm32
 	mv block_match_flow_arm32.h include/
 	mv block_match_flow_arm32.o lib/
 
-include/block_match_flow_arm32.o: bin/block_match_flow_generate_arm32
+lib/block_match_flow_arm32.o: bin/block_match_flow_generate_arm32
 	./bin/block_match_flow_generate_arm32
 	mv block_match_flow_arm32.h include/
 	mv block_match_flow_arm32.o lib/
