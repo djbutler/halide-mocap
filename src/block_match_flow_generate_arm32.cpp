@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     
 
     // Store only enough of conv at a time to compute each tile
-    conv.compute_root().reorder(i, j, x, y).gpu_tile(x, y, 64, 64);
+    conv.compute_root().reorder(i, j, x, y).gpu_tile(x, y, 32, 32);
     //conv.gpu_tile(x, y, 16, 16); // Cannot parallelize dimension x.__thread_id_x of function conv because the function is scheduled inline
   //  conv.store_at(flow, xo);
 //    conv.compute_at(flow, xi);
