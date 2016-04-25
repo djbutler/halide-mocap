@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
     Target target;
     target.os = Target::Linux; // The operating system
     target.arch = Target::ARM;   // The CPU architecture
+    target.set_feature(Target::CUDA); // Enable GPU CUDA
     target.bits = 32;            // The bit-width of the architecture
     std::vector<Target::Feature> arm_features; // A list of features to set
     target.set_features(arm_features);
