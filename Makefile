@@ -17,5 +17,5 @@ include/block_match_flow_arm32.o: bin/block_match_flow_generate
 	mv block_match_flow_arm32.h include/
 	mv block_match_flow_arm32.o lib/
 
-bin/block_match_flow_arm32: src/block_match_flow_arm32.cpp include/block_match_flow_arm32.h 
+bin/block_match_flow_arm32: src/block_match_flow_arm32.cpp
 	g++ src/block_match_flow_arm32.cpp -g -std=c++11 -I /home/ubuntu/dev/halide/include -I /home/ubuntu/dev/halide/tools -I /home/ubuntu/dev/halide-mocap/include -pthread -Wl,--no-as-needed -ldl lib/block_match_flow_arm32.o `libpng-config --cflags --ldflags` -o bin/block_match_flow_arm32
